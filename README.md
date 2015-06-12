@@ -16,3 +16,7 @@ Model executables to predict the effect of management decisions on water, sedime
 Cost, Licensing and Availability:
 
 Model is offered free of charge from USDA through the link provided above. 
+
+---
+
+Current SWAT model version here is rev622, latest on http://swat.tamu.edu/
