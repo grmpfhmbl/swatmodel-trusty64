@@ -1,4 +1,4 @@
-## The Soil and Water Assessment Tool (SWAT)
+## The Soil and Water Assessment Tool (SWAT) [![Build Status](https://travis-ci.org/grmpfhmbl/swatmodel-trusty64.svg?branch=master)](https://travis-ci.org/grmpfhmbl/swatmodel-trusty64)
 
 SWAT is a river basin scale model developed to quantify the impact of land management practices on water, sediment
 and agricultural chemical yields in large complex watersheds with varying soils, land use and management conditions
@@ -19,4 +19,10 @@ Model is offered free of charge from USDA through the link provided above.
 
 ---
 
-Current SWAT model version here is rev622, latest on http://swat.tamu.edu/
+This is based on SWAT model version rev637. Get latest at http://swat.tamu.edu/
+
+---
+
+Makefile from https://zhiqiangyu.wordpress.com/swat/compile-and-debug-swat-with-gfortran-and-eclipse/
+
+Additional package is needed to build 32 & 64 bit `sudo apt-get install gfortran-multilib`

@@ -134,7 +134,7 @@
 	real*8 no3_inflow_ste, bio_steintobz,bio_outbz,bza,qi,nperc
 	real*8 nh3_init, no3_init, hvol, solpconc, solpsorb, qlyr,qsrf
 	real*8 n1,n2,n3,n4,n5,n6,n7,n8,p1,p2,p3,p4
-	real*8 solp_init,solp_begin,solp_end,svolp,totalp,ctmp
+	real*8 solp_init,solp_begin,solp_end,svolp,totalp,ctmp,plch
 
 	j = ihru
 	nly = sol_nly(j)
@@ -157,6 +157,8 @@
 	! final volume
 	hvol = sol_st(bz_lyr,j) * bza * 10.
 	rtof = 0.5
+      
+	xx = qin / hru_ha(j) / 1000.
 
 	nh3_init = sol_nh3(bz_lyr,j)
 	no3_init = sol_no3(bz_lyr,j)
@@ -192,23 +194,6 @@
 
 	!! Active system
 
-
-   !! Water content(eqn 4-12), biozone hydraulic conductivity(eqn 4-9), 
-	!! and percolation (eqn 4-8,10,11) are computed in percmain/percmicro
-
-
-	! Add STE nutrients to appropriate soil pools in mass unit
-	xx = qin / bza / 1000. ! used for unit conversion: mg/l -> kg/ha
-      sol_no3(bz_lyr,j) = sol_no3(bz_lyr,j) + xx * (sptno3concs(isp) +  
-     &    sptno2concs(isp))  
-	sol_nh3(bz_lyr,j) = sol_nh3(bz_lyr,j) + xx * sptnh4concs(isp) 
-	sol_orgn(bz_lyr,j) = sol_orgn(bz_lyr,j)+xx*sptorgnconcs(isp)*rtof
-      sol_fon(bz_lyr,j)=sol_fon(bz_lyr,j)+xx*sptorgnconcs(isp)*(1-rtof)
-      sol_orgp(bz_lyr,j)=sol_orgp(bz_lyr,j)+xx*sptorgps(isp)*rtof
-	sol_fop(bz_lyr,j)=sol_fop(bz_lyr,j)+xx*sptorgps(isp)*(1-rtof)
-      sol_solp(bz_lyr,j)=sol_solp(bz_lyr,j)+xx*sptminps(isp)  
-      bio_bod(j)=bio_bod(j)+xx*sptbodconcs(isp)   ! J.Jeong 4/03/09
-
       bodi = bio_bod(j) * bza / qi * 1000.  !mg/l
 
 	!! Field capacity in the biozone Eq. 4-6  ! 
@@ -227,7 +212,6 @@
 	  failyr(j) = iida/365. + curyr - 1
 	endif
      
-
 	!! Respiration rate(kg/ha)  Eq. 4-2   
 	rrsp = ctmp * coeff_rsp(j) * biom(j) 
 
@@ -293,27 +277,30 @@
 	sol_no3(bz_lyr,j) = sol_no3(bz_lyr,j) - rdenit		!J.Jeong 3/09/09
 
  	!soil volume for sorption: soil thickness below biozone 
-      svolp = (sol_z(nly,j) - bz_z(j)) * bza * 10. !m3, 
+      svolp = (sol_z(nly,j) - bz_z(j)) * bza * 10.*(1-sol_por(bz_lyr,j))!m3, 
    
    !max adsorption amnt: linear isotherm, McCray 2005
       solpconc = sol_solp(bz_lyr,j) * bza / qi * 1000. !mg/l
 	solpsorb = min(coeff_pdistrb(j) * solpconc,coeff_psorpmax(j)) !mgP/kgSoil
-	solpsorb = 1.6 * 1.e-3 * solpsorb * svolp * (1-sol_por(bz_lyr,j)) !kgP sorption potential	
+	solpsorb = 1.6 * 1.e-3 * solpsorb * svolp  !kgP sorption potential	
 
   !check if max. P sorption is reached 
       if(sol_solp(bz_lyr,j)*bza<solpsorb) then
-       totalp = sol_solp(bz_lyr,j)+sol_actp(bz_lyr,j) !+sol_stap(bz_lyr,j)
-       solp_end = coeff_solpslp(j) * totalp  + coeff_solpintc(j)
+        totalp = sol_solp(bz_lyr,j)+sol_actp(bz_lyr,j) ! kg/ha
+        totalp = totalp * bza *1e3 / (1.6 * svolp) !mgP/kg Soil
+        solp_end = coeff_solpslp(j) * totalp  + coeff_solpintc(j) !mgP/kgSoil; Bond et al. (2006)
+        solp_end = 1.6 * 1.e-3 * solp_end * svolp / bza ! kg/ha
         if (solp_end>sol_solp(bz_lyr,j)) then
-         solp_end = sol_solp(bz_lyr,j)
+          solp_end = sol_solp(bz_lyr,j)
         endif 
-      sol_actp(bz_lyr,j)=sol_actp(bz_lyr,j)+sol_solp(bz_lyr,j)-solp_end
-      sol_solp(bz_lyr,j) = solp_end
-      endif	     
+       sol_actp(bz_lyr,j)=sol_actp(bz_lyr,j)+sol_solp(bz_lyr,j)-solp_end
+        sol_solp(bz_lyr,j) = solp_end
+      endif
+      
       solpconc = sol_solp(bz_lyr,j) * bza / qi * 1000. !mg/l
-	percp(j) = 0.01*solpconc * qout / bza * 1.e-3
-	sol_solp(bz_lyr,j) = sol_solp(bz_lyr,j) - percp(j) !kg/ha
-      sol_solp(bz_lyr+1,j) = sol_solp(bz_lyr+1,j) + percp(j) !kg/ha	     
+	plch = solpconc * qout / bza * 1.e-3 !kg/ha
+	sol_solp(bz_lyr,j) = sol_solp(bz_lyr,j) - plch !kg/ha
+      sol_solp(bz_lyr+1,j) = sol_solp(bz_lyr+1,j) + plch !kg/ha	     
       nh3_end = sol_nh3(bz_lyr,j)
 	no3_end = sol_no3(bz_lyr,j)
       solp_end = sol_solp(bz_lyr,j)  
@@ -331,7 +318,6 @@
       if (curyr > nyskip) then
         wshd_nitn = wshd_nitn + rnit * hru_dafr(j)
         wshd_dnit = wshd_dnit + rdenit * hru_dafr(j)
-        wshd_plch = wshd_plch + percp(j) * hru_dafr(j)
         wdntl = wdntl + rdenit
       end if
 	       

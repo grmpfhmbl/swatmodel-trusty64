@@ -111,10 +111,10 @@
 
 
 !!    compute fraction of surface runoff that is reaching the main channel
-        if (ievent>1) then
-           brt(j) = 1. - Exp(-surlag / (tconc(j) / (idt / 60.)))	!! urban modeling by J.Jeong
+        if (ievent > 0) then
+           brt(j) = 1. - Exp(-surlag(j) / (tconc(j) / (idt / 60.)))	!! urban modeling by J.Jeong
         else
-           brt(j) = 1. - Exp(-surlag / tconc(j))
+           brt(j) = 1. - Exp(-surlag(j) / tconc(j))
         endif
         if (isproj == 2) brt(j) = 1.
         
@@ -153,7 +153,7 @@
 
       end do
 
-      if (ievent > 1) then
+      if (ievent > 0) then
 !!    compute unit hydrograph for computing subbasin hydrograph from direct runoff
 
       do isb = 1, msub 

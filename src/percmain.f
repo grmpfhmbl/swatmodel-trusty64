@@ -36,7 +36,7 @@
 !!                               |saturation
 !!    voltot      |mm            |total volume of cracks expressed as depth
 !!                               |per unit area
-!!    wtabelo     |mm            |water table based on depth from soil surface
+!!    wat_tbl(:)  |mm            |water table based on depth from soil surface
 !!    ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 !!    ~ ~ ~ OUTGOING VARIABLES ~ ~ ~
@@ -90,11 +90,12 @@
 
       use parm
 
-      integer :: j, j1, nn, k, sb
+      integer :: j, j1, nn, k, sb,isp
 
       j = 0
       j = ihru
       sb = inum1
+      isp = isep_typ(j) 	   !! J.Jeong 6/25/14
 
       !! initialize water entering first soil layer
 
@@ -140,6 +141,7 @@
           sol_orgp(j1,j) = sol_orgp(j1,j) + xx * sptorgps(isp) * 0.5
           sol_fop(j1,j) = sol_fop(j1,j) + xx * sptorgps(isp) * 0.5
           sol_solp(j1,j) = sol_solp(j1,j) + xx * sptminps(isp)  
+          bio_bod(j)=bio_bod(j)+xx*sptbodconcs(isp)   ! J.Jeong 4/03/09
         end if
 
        !! determine gravity drained water in layer
@@ -180,7 +182,7 @@
       end do
       
         !! seepage contribution by urban distributed bmps
-        if (ievent >= 2) then
+        if (ievent > 0) then
           sepbtm(j) = sepbtm(j) + bmp_recharge(sb) 
         endif
 
@@ -214,16 +216,27 @@
           end if
         else
           !compute water table depth using Daniel's modifications
+   !       Updated water table depth D.Moriasi 4/8/2014
+           swst_del = 0.
+           sw_del = 0.
+           wt_del = 0.
+           wtst_del = 0.
           do j1 = 1, sol_nly(j)
-            if (wat_tbl(j) < sol_z(j1,j)) then
-              sw_del = sol_swpwt(j) - sol_sw(j)
-              wt_del = sw_del * vwt(j1,j)
-              wat_tbl(j) = wat_tbl(j) + wt_del
-	        if(wat_tbl(j) > dep_imp(j)) wat_tbl(j) = dep_imp(j)
-	        wt_shall = dep_imp(j) - wat_tbl(j)
-	        sol_swpwt(j) = sol_sw(j)
-	        exit
-	      end if
+!            if (wat_tbl(j) < sol_z(j1,j)) then
+             swst_del = sol_stpwt(j1,j) - sol_st(j1,j)
+             sw_del = sol_swpwt(j) - sol_sw(j)
+             wt_del = sw_del * vwt(j1,j)
+             wtst_del = swst_del * vwt(j1,j)
+ !            wat_tbl(j) = wat_tbl(j) + wt_del 
+             wat_tbl(j) = wat_tbl(j) + wtst_del  
+             if(wat_tbl(j) < 0.0) wat_tbl(j) = 0.0
+	       if(wat_tbl(j) > dep_imp(j)) wat_tbl(j) = dep_imp(j)
+	       wt_shall = dep_imp(j) - wat_tbl(j)
+	       sol_swpwt(j) = sol_sw(j)
+	       sol_stpwt(j1,j) = sol_st(j1,j)
+!	        exit
+!	      end if
+!       Updated water table depth D.Moriasi 4/8/2014
 	    end do
         end if
         !! drainmod wt_shall equations   10/23/2006

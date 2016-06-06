@@ -16,12 +16,8 @@
 !!    i             |none          |HRU number
 !!    ievent        |none          |rainfall/runoff code
 !!                                 |0 daily rainfall/curve number technique
-!!                                 |1 daily rainfall/Green&Ampt technique/daily
+!!                                 |1 sub-daily rainfall/Green&Ampt/hourly
 !!                                 |  routing
-!!                                 |2 sub-daily rainfall/Green&Ampt technique/
-!!                                 |  daily routing
-!!                                 |3 sub-daily rainfall/Green&Ampt/hourly 
-!!                                 |routing
 !!    rock(:)       |%             |percent of rock fragments in soil layer
 !!    sol_silt(:,:) |%             |percent silt content in soil material
 !!    sol_awc(:,:)  |mm H20/mm soil|available water capacity of soil layer
@@ -128,7 +124,7 @@
         end if
         !! compute drainable porosity and variable water table factor - Daniel
         drpor = sol_por(j,i) - sol_up(j,i)
-        vwt(j,i) = (437.13 * drpor**2) - (95.08 * drpor) + 8.257  
+        vwt(j,i)= ((437.13 * drpor**2)-(95.08 * drpor)+8.257) 
        end do
 
       sa = sol_sand(1,i) / 100.
@@ -188,13 +184,22 @@
         xx = sol_z(j,i)
       end do
       !! initialize water table depth and soil water for Daniel
+!      sol_swpwt(i) = sol_sw(i)
+!      if (ffc(i) > 1.) then
+!        wat_tbl(i) = (sol_sumul(i) - ffc(i) * sol_sumfc(i)) /           
+!     &                                                      sol_z(nly,i)
+!      else
+!        wat_tbl(i) = 0.
+!      end if
+      !!Initializing water table depth and soil water revised by D. Moriasi 4/8/2014
+        do j = 1, nly
+        sol_stpwt(j,i) = sol_st(j,i)
+        end do      
       sol_swpwt(i) = sol_sw(i)
-      if (ffc(i) > 1.) then
-        wat_tbl(i) = (sol_sumul(i) - ffc(i) * sol_sumfc(i)) /           
-     &                                                      sol_z(nly,i)
-      else
-        wat_tbl(i) = 0.
-      end if
+      wat_tbl(i) = dep_imp(i)- (shallst(i)/sol_por(nly,i))
+
+      !!Initializing water table depth and soil water revised by D. Moriasi 4/8/2014      
+   !! initialize water table depth and soil water for Daniel   
       sol_avpor(i) = sumpor / sol_z(nly,i)
       sol_avbd(i) = 2.65 * (1. - sol_avpor(i))
 
