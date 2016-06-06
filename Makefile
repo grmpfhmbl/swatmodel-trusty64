@@ -1,5 +1,6 @@
 #Generated using GenerateMakefile by Zhiqiang Yu, hawklorry@gmail.com
 #Saturday, February 08, 2014 10:18:22 AM
+#
 
 #Define compiler
 CC=gcc
