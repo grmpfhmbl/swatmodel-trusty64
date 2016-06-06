@@ -98,10 +98,10 @@
      &                   + sptno2concs(isp))  
 	     sol_nh3(ii-1,j) = sol_nh3(ii-1,j) + xx * sptnh4concs(isp) 
 	     sol_orgn(ii-1,j) = sol_orgn(ii-1,j) + xx*sptorgnconcs(isp)*0.5
-         sol_fon(ii-1,j) = sol_fon(ii-1,j) + xx * sptorgnconcs(isp)*0.5
-         sol_orgp(ii-1,j) = sol_orgp(ii-1,j) + xx * sptorgps(isp) * 0.5
+       sol_fon(ii-1,j) = sol_fon(ii-1,j) + xx * sptorgnconcs(isp)*0.5
+       sol_orgp(ii-1,j) = sol_orgp(ii-1,j) + xx * sptorgps(isp) * 0.5
 	     sol_fop(ii-1,j) = sol_fop(ii-1,j) + xx * sptorgps(isp) * 0.5
-         sol_solp(ii-1,j) = sol_solp(ii-1,j) + xx * sptminps(isp)  
+       sol_solp(ii-1,j) = sol_solp(ii-1,j) + xx * sptminps(isp)  
 	   else 
 	     qlyr = 0.
 	   endif
