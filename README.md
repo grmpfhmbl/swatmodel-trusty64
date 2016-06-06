@@ -1,4 +1,4 @@
-## The Soil and Water Assessment Tool (SWAT)
+## The Soil and Water Assessment Tool (SWAT) [![Build Status](https://travis-ci.org/grmpfhmbl/swatmodel-trusty64.svg?branch=master)](https://travis-ci.org/grmpfhmbl/swatmodel-trusty64)
 
 SWAT is a river basin scale model developed to quantify the impact of land management practices on water, sediment
 and agricultural chemical yields in large complex watersheds with varying soils, land use and management conditions
