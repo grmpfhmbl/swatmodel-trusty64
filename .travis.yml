@@ -1,0 +1,11 @@
+# Travis doesn't have a fortran build config, so we'll use c as a base and
+# create our own environment
+language: c
+sudo: required
+
+install:
+    - sudo apt-get update
+    - sudo apt-get install gfortran gfortran-multilib
+
+script: 
+    - make rel64 debug64
