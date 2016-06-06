@@ -1,11 +1,13 @@
       module parm
       integer icalen
+      real :: prf_bsn
       
       real, dimension (:), allocatable :: alph_e
-      real, dimension (:), allocatable :: co_p
+      real, dimension (:), allocatable :: co_p, surlag, cdn, nperco
+      real, dimension (:), allocatable :: cmn, phoskd, psp, sdnco
       
 !!   change per JGA 8/31/2011 gsm for output.mgt 
-      real :: yield, burn_frlb, pst_kg
+      real :: yield, burn_frlb, pst_kg, r2adj_bsn
       real :: yieldgrn, yieldbms, yieldtbr, yieldn, yieldp
       real :: hi_bms, hi_rsd, yieldrsd
 !!    arrays for Landscape Transport Capacity 5/28/2009 nadia
@@ -59,33 +61,34 @@
       real :: fertp, grazn, grazp, soxy, qdfr, sdti, rtwtr, ressa, wgps
       real :: rttime, rchdep, rtevp, rttlc, da_km, resflwi, wdlps, wglps
       real :: resflwo, respcp, resev, ressep,ressedi,ressedo,dtot,wdprch
-      real :: nperco, pperco, rsdco, phoskd, voltot, volcrmin, msk_x
-      real :: uno3d, canev, usle, rcn, surlag, bactkdq, precipday, wdpf
+      real :: nperco_bsn,pperco_bsn,rsdco,phoskd_bsn,voltot
+      real :: volcrmin, msk_x
+      real :: uno3d, canev, usle, rcn, surlag_bsn,bactkdq,precipday,wdpf
       real :: thbact, wpq20, wlpq20, wps20, wlps20, bactrop, bactsedp
       real :: bactlchp, bactlchlp, enratio, wetpcp, pndpcp, wetsep, wgpf
       real :: pndsep, wetev, pndev, pndsedo, wetsedo, pndflwi, wetflwi
       real :: pndflwo, wetflwo, wetsedi, da_ha, twlwet, twlpnd, vpd
       real :: bactrolp, bactsedlp, evrch, evlai, pet_day, ep_day, wdlpf
-      real :: snoev, sno3up, adj_pkr, n_updis, p_updis, nactfr, reactw
+      real :: snoev, sno3up, adj_pkr, n_updis,p_updis,nactfr,reactw
       real :: sdiegropq, sdiegrolpq, sdiegrops, sdiegrolps, es_day
       real :: sbactrop, sbactrolp, sbactsedp, sbactsedlp, ep_max, wof_lp
-      real :: sbactlchp, sbactlchlp, psp, rchwtr, resuspst, setlpst
+      real :: sbactlchp, sbactlchlp, psp_bsn, rchwtr, resuspst, setlpst
       real :: bsprev, bssprev, spadyo, spadyev, spadysp, spadyrfv
       real :: spadyosp
       real :: qday, usle_ei, al5, pndsedc, no3pcp, rcharea, volatpst
-      real :: wetsedc, uobw, ubw, uobn, uobp, prf, respesti, wglpf
+      real :: wetsedc, uobw, ubw, uobn, uobp, respesti, wglpf
       real :: snocovmx, snocov1, snocov2, rexp, rcor, lyrtile, lyrtilex
       real :: ai0, ai1, ai2, ai3, ai4, ai5, ai6, rhoq, tfact, sno50cov
       real :: mumax, lambda0, lambda1, lambda2, k_l, k_n, k_p, p_n
       real :: rnum1, autop, auton, etday, hmntl, rwntl, hmptl, rmn2tl
-      real :: rmptl, wdntl, cmn, rmp1tl, roctl, gwseep, revapday, reswtr
+      real :: rmptl,wdntl,cmn_bsn,rmp1tl,roctl,gwseep,revapday,reswtr
       real :: bury, difus, reactb, solpesto, petmeas, wdlprch, wdpres
-      real :: sorpesto, spcon, spexp, solpesti, sorpesti, wdlpres
+      real :: sorpesto, spcon_bsn, spexp_bsn, solpesti, sorpesti,wdlpres
       real :: snoprev, swprev, shallstp, deepstp, msk_co1, msk_co2
       real :: ressolpo, resorgno, resorgpo, resno3o, reschlao, resno2o
       real :: resnh3o, qdbank, potpcpmm, potevmm, potsepmm, potflwo
       real :: potsedo, pest_sol, trnsrch, wp20p_plt, bactminp, bactminlp
-      real :: wp20lp_plt, cncoef, cdn, sdnco, bact_swf, bactmx, bactmin
+      real :: wp20lp_plt,cncoef,cdn_bsn,sdnco_bsn,bact_swf,bactmx,bactmin
       real :: chla_subco, tb_adj, cn_froz, dorm_hr, smxco
       real :: depimp_bsn, ddrain_bsn, tdrain_bsn, gdrain_bsn
       real :: rch_san, rch_sil, rch_cla, rch_sag, rch_lag, rch_gra
@@ -100,11 +103,11 @@
 !    Drainmod tile equations  01/2006
       real, dimension (:), allocatable :: wat_tbl,sol_swpwt
       real, dimension (:,:), allocatable :: vwt
-	  real :: re_bsn, sdrain_bsn, sstmaxd_bsn, r2adj
+	  real :: re_bsn, sdrain_bsn, sstmaxd_bsn
 	  real :: drain_co_bsn, pc_bsn, latksatf_bsn 
 !    Drainmod tile equations  01/2006
       integer :: i_subhw, imgt, idlast, iwtr, ifrttyp, mo_atmo, mo_atmo1
-      integer :: ifirstatmo, iyr_atmo, iyr_atmo1
+      integer :: ifirstatmo, iyr_atmo, iyr_atmo1, matmo
       integer :: mrg, mch, mcr, mpdb, mcrdb, mfdb, mhru, mhyd, mfcst
       integer :: mnr, myr, mcut, mgr, msubo, mrcho, isubwq, ffcst
       integer :: nhru, isproj, mo, nbyr, immo, nrch, nres, irte, i_mo
@@ -113,7 +116,7 @@
       integer :: nrgage, ntgage, nrgfil, ntgfil, nrtot, nttot, mrech
       integer :: lao, igropt, npmx, irtpest, curyr, tmpsim, icrk, iihru
 !    Drainmod tile equations  01/2006
-	integer :: ismax, itdrn, iwtdn, iroutunit
+	integer :: ismax, itdrn, iwtdn, iroutunit, ires_nut
 !    Drainmod tile equations  01/2006
       integer :: mtil, mvaro, mrecd, idist, mudb, mrecm, mrecc, iclb
       integer :: mrecy, ipet, nyskip, ideg, ievent, slrsim, iopera
@@ -252,7 +255,8 @@
       real, dimension (:), allocatable :: depch,depsanch,depsilch
       real, dimension (:), allocatable :: depclach,depsagch,deplagch
       real, dimension (:), allocatable :: depgrach,depgrafp,grast
-      real, dimension (:), allocatable :: depprch,depprfp
+      real, dimension (:), allocatable :: depprch,depprfp,prf,r2adj
+      real, dimension (:), allocatable :: spcon, spexp
       real, dimension (:), allocatable :: sanst,silst,clast,sagst,lagst
       real, dimension (:), allocatable :: pot_san,pot_sil,pot_cla
       real, dimension (:), allocatable :: pot_sag,pot_lag
@@ -303,6 +307,7 @@
       real, dimension (:), allocatable :: latcos,latsin,phutot
       real, dimension (:), allocatable :: tlaps,plaps,tmp_an,sub_precip
       real, dimension (:), allocatable :: pcpdays, rcn_sub, rammo_sub
+      real, dimension (:), allocatable :: atmo_day
       real, dimension (:), allocatable :: sub_snom,sub_qd,sub_sedy
       real, dimension (:), allocatable :: sub_tran,sub_no3,sub_latno3
       real, dimension (:,:), allocatable :: sub_smtmp,sub_timp,sub_sftmp
@@ -320,6 +325,7 @@
       
 !!!!!! drains
       real, dimension (:), allocatable :: wnan
+      real, dimension (:,:), allocatable :: sol_stpwt
       real, dimension (:,:), allocatable :: sub_pst,sub_hhqd,sub_hhwtmp
       real, dimension (:,:), allocatable :: rfinc,tmpinc,radinc,huminc
       real, dimension (:,:), allocatable :: wndav,ch_k,elevb,elevb_fr
@@ -371,6 +377,8 @@
       real, dimension (:), allocatable :: br2,res_rr,res_sed,lkpst_koc
       real, dimension (:), allocatable :: lkpst_stl,lkpst_rsp,lkpst_mix
       real, dimension (:), allocatable :: lkspst_conc,lkspst_rea
+      real, dimension (:), allocatable :: theta_n, theta_p, con_nirr
+      real, dimension (:), allocatable :: con_pirr
       real, dimension (:), allocatable :: lkspst_bry,lkspst_act,sed_stlr
       real, dimension (:), allocatable :: wurtnf,res_nsed,resdata,chlar
       real, dimension (:), allocatable :: res_orgn,res_orgp,res_no3
@@ -574,6 +582,8 @@
       real, dimension (:), allocatable :: manure_kg, auto_nstrs
       real, dimension (:,:), allocatable :: rcn_mo, rammo_mo
       real, dimension (:,:), allocatable :: drydep_no3_mo, drydep_nh4_mo
+      real, dimension (:), allocatable :: rcn_d, rammo_d
+      real, dimension (:), allocatable :: drydep_no3_d, drydep_nh4_d
       real, dimension (:,:), allocatable :: yldn
       real, dimension (:,:), allocatable :: gwati, gwatn, gwatl
       real, dimension (:,:), allocatable :: gwatw, gwatd, gwatveg

@@ -19,4 +19,4 @@ Model is offered free of charge from USDA through the link provided above.
 
 ---
 
-Current SWAT model version here is rev622, latest on http://swat.tamu.edu/
+This is based on SWAT model version rev637. Get latest at http://swat.tamu.edu/
