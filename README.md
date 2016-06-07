@@ -21,8 +21,18 @@ Model is offered free of charge from USDA through the link provided above.
 
 This is based on SWAT model version rev637. Get latest at http://swat.tamu.edu/
 
----
 
-Makefile from https://zhiqiangyu.wordpress.com/swat/compile-and-debug-swat-with-gfortran-and-eclipse/
+## Build
 
-Additional package is needed to build 32 & 64 bit `sudo apt-get install gfortran-multilib`
+Makefile from https://zhiqiangyu.wordpress.com/swat/compile-and-debug-swat-with-gfortran-and-eclipse/ and slightly adapted.
+
+Additional package is needed to build 32 & 64 bit on one machine `sudo apt-get install gfortran-multilib`
+
+All build artifacts are put in _build_. To run just type `make <target>` on your command line. Replace _<target>_ with
+
+* `rel32` --> release version 32bit
+* `rel64` --> release version 64bit
+* `debug32` --> debug version 32bit
+* `debug64` --> debug version 64bit
+* `clean` --> deletes all build artifacts
+** `debug32_clean`, `debug64_clean`, `rel32_clean`, `rel64_clean` --> deletes build artifacts of specific version
