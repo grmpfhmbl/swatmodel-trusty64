@@ -23,6 +23,8 @@ LONGFREE=-ffree-line-length-200
 ARCH32=-m32
 ARCH64=-m64
 
+STATIC=
+
 all: debug32 debug64 rel32 rel64
 
 clean: debug32_clean debug64_clean rel32_clean rel64_clean
@@ -38,7 +40,7 @@ debug32_mkdir:
 	mkdir -p dist/debug32
 
 ${NAMEDEBUG32}: ${OBJECTS_DEBUG32}
-	${FC} ${OBJECTS_DEBUG32} ${ARCH32} -static -o dist/${NAMEDEBUG32}
+	${FC} ${OBJECTS_DEBUG32} ${ARCH32} ${STATIC} -o dist/${NAMEDEBUG32}
 
 dist/debug32/addh.o: src/addh.f dist/debug32/main.o
 	${FC} ${ARCH32} ${FFLAG} ${DFLAG}  src/addh.f -o dist/debug32/addh.o -I dist/debug32
@@ -959,7 +961,7 @@ debug64_mkdir:
 	mkdir -p dist/debug64
 
 ${NAMEDEBUG64}: ${OBJECTS_DEBUG64}
-	${FC} ${OBJECTS_DEBUG64} ${ARCH64} -static -o dist/${NAMEDEBUG64}
+	${FC} ${OBJECTS_DEBUG64} ${ARCH64} ${STATIC} -o dist/${NAMEDEBUG64}
 
 
 dist/debug64/addh.o: src/addh.f dist/debug64/main.o
@@ -1881,7 +1883,7 @@ rel32_mkdir:
 	mkdir -p dist/rel32
 
 ${NAMEREL32}: ${OBJECTS_REL32}
-	${FC} ${OBJECTS_REL32} ${ARCH32} -static -o dist/${NAMEREL32}
+	${FC} ${OBJECTS_REL32} ${ARCH32} ${STATIC} -o dist/${NAMEREL32}
 
 
 dist/rel32/addh.o: src/addh.f dist/rel32/main.o
@@ -2803,7 +2805,7 @@ rel64_mkdir:
 	mkdir -p dist/rel64
 
 ${NAMEREL64}: ${OBJECTS_REL64}
-	${FC} ${OBJECTS_REL64} ${ARCH64} -static -o dist/${NAMEREL64}
+	${FC} ${OBJECTS_REL64} ${ARCH64} ${STATIC} -o dist/${NAMEREL64}
 
 
 dist/rel64/addh.o: src/addh.f dist/rel64/main.o
